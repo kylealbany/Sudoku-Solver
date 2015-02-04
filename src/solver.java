@@ -1,27 +1,157 @@
 import java.util.Arrays;
 import java.lang.Math;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+
+/**To do:
+ * Fix solution border display
+ * Add button to solve instead of waiting
+ * Add reset button to clear inputs
+ * Change fonts so input/solution text looks nicer
+ * Clean up code
+ */
 
 public class solver {
-	
 	
 	public static void main(String[] args) {
 		final long startTime = System.currentTimeMillis();
 		
-		//unsolved puzzle, need to replace with better input method
-		int[][] puzzle={{0,0,2,0,0,0,0,1,0},{8,0,0,0,6,0,4,0,9},{1,0,0,3,0,2,0,0,8},{0,1,0,0,0,3,8,4,0},{6,2,8,5,0,4,9,3,1},{0,4,9,6,0,0,0,7,0},{5,0,0,4,0,1,0,0,3},{2,0,1,0,3,0,0,0,4},{0,9,0,0,0,0,1,0,0}};
-		
-		solve(puzzle);
+		createGUI();
+        
+		//now update GUI with new puzzle, wait until close or reset button is hit
+		//fix GUI code 
 		
 		final long endTime = System.currentTimeMillis();
 		System.out.printf("Total execution time: %.6f seconds",(endTime-startTime)/(double)1000);
 	}
 	
 	
+	public static void createGUI(){
+		JFrame frame = new JFrame("Sudoku Solver");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    JTextField f[][]= new JTextField[9][9];
+	    JPanel boxes[][]= new JPanel [3][3];
+	    JPanel buttons=new JPanel();
+		
+        for(int x=0; x<9; x++){
+            for(int y=0; y<9; y++){
+                f[x][y]=new JTextField(1);
+            }
+        }
+		
+        for(int x=0; x<3; x++){
+            for(int y=0; y<3; y++){
+                boxes[x][y]=new JPanel(new GridLayout(3,3));
+            }
+        }
+        
+        frame.setLayout(new GridLayout(3,3,5,5));
+
+        for(int u=0; u<3; u++){
+            for(int i=0; i<3; i++){    
+                for(int x=0; x<3; x++ ){
+                    for(int y=0; y<3; y++){
+                        boxes[u][i].add(f[x+u*3][y+i*3]);
+                    }
+                }
+            
+            frame.add(boxes[u][i]);
+            }
+        }
+
+        JButton solve = new JButton("Solve puzzle");
+        solve.setVerticalTextPosition(AbstractButton.CENTER);
+        solve.setHorizontalTextPosition(AbstractButton.LEADING);
+        solve.setMnemonic(KeyEvent.VK_ENTER);
+        buttons.add(solve);
+        //frame.add(buttons);
+
+        frame.setSize(500,500);
+        frame.setVisible(true);
+        
+        ////////
+        ///////remove and replace with wait for button
+        try {
+            //thread to sleep for the specified number of milliseconds
+            Thread.sleep(7000);
+        } catch ( java.lang.InterruptedException ie) {
+            System.out.println(ie);
+        }
+        //////
+        System.out.println("sleep over");
+        
+        
+        frame.dispose();
+        readInput(f);
+	}
+	
+	
+	public static void readInput(JTextField[][] inputs){
+		
+        int[][] puzzle=new int[9][9];
+        
+        for(int i=0;i<9;i++){
+        	for(int j=0;j<9;j++){
+        		if(!(inputs[i][j].getText().equals(""))){
+        			puzzle[i][j]=Integer.parseInt(inputs[i][j].getText());
+        		}
+        	}
+        }
+        
+        System.out.println(Arrays.deepToString(puzzle));//remove after added gui updating
+        
+        solve(puzzle);
+		
+	}
+	
+	public static void showSol(int[][] sol){
+		
+		JFrame frame = new JFrame("Sudoku Solver");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JPanel boxes[][]= new JPanel [3][3];
+		
+        for(int x=0; x<3; x++){
+            for(int y=0; y<3; y++){
+                boxes[x][y]=new JPanel(new GridLayout(3,3));
+            }
+        }
+        
+        frame.setLayout(new GridLayout(3,3,5,5));
+		
+        JLabel[][] numbers = new JLabel [9][9];
+        for(int i=0;i<9;i++){
+        	for(int j=0;j<9;j++){
+        		numbers[i][j]=new JLabel(Integer.toString(sol[i][j]));
+        	}
+        }
+        
+        
+        
+        for(int u=0; u<3; u++){
+            for(int i=0; i<3; i++){    
+                for(int x=0; x<3; x++ ){
+                    for(int y=0; y<3; y++){
+                        boxes[u][i].add(numbers[x+u*3][y+i*3]);
+                    }
+                }
+            
+            frame.add(boxes[u][i]);
+            }
+        }
+
+        frame.setSize(500,500);
+        frame.setVisible(true);
+        
+	}
+	
 	public static boolean solve(int[][] puzzle){
 		
 		//check if there are no empty spaces, if there aren't then it is solved
 		if(findNext(puzzle)==null){
-			System.out.println(Arrays.deepToString(puzzle));
+			//System.out.println(Arrays.deepToString(puzzle));  //change to update GUI
+			showSol(puzzle);
 			return true;
 		}
 		
